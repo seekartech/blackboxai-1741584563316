@@ -1,89 +1,74 @@
 import React from 'react';
-import { Box, Typography, Button, Breadcrumbs, Link } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
-import { NavigateNext as NavigateNextIcon } from '@mui/icons-material';
+import { Box, Typography, Breadcrumbs, Link } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-function PageHeader({
-  title,
+function PageHeader({ 
+  title, 
   subtitle,
   breadcrumbs = [],
-  action,
-  actionIcon,
-  actionLabel,
-  onActionClick,
+  actions,
+  sx = {},
 }) {
+  const navigate = useNavigate();
+
   return (
-    <Box sx={{ mb: 4 }}>
-      {/* Breadcrumbs */}
+    <Box
+      sx={{
+        mb: 3,
+        ...sx,
+      }}
+    >
       {breadcrumbs.length > 0 && (
-        <Breadcrumbs
-          separator={<NavigateNextIcon fontSize="small" />}
-          aria-label="breadcrumb"
-          sx={{ mb: 2 }}
-        >
-          <Link
-            component={RouterLink}
-            to="/dashboard"
-            color="inherit"
-            sx={{ 
-              textDecoration: 'none',
-              '&:hover': { textDecoration: 'underline' }
-            }}
-          >
-            Dashboard
-          </Link>
-          {breadcrumbs.map((breadcrumb, index) => {
-            const isLast = index === breadcrumbs.length - 1;
-            return isLast ? (
-              <Typography key={index} color="text.primary">
-                {breadcrumb.label}
-              </Typography>
-            ) : (
-              <Link
-                key={index}
-                component={RouterLink}
-                to={breadcrumb.href}
-                color="inherit"
-                sx={{ 
-                  textDecoration: 'none',
-                  '&:hover': { textDecoration: 'underline' }
-                }}
-              >
-                {breadcrumb.label}
-              </Link>
-            );
-          })}
+        <Breadcrumbs sx={{ mb: 2 }}>
+          {breadcrumbs.map((crumb, index) => (
+            <Link
+              key={index}
+              color={index === breadcrumbs.length - 1 ? 'text.primary' : 'inherit'}
+              sx={{ 
+                cursor: crumb.path ? 'pointer' : 'default',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: crumb.path ? 'underline' : 'none',
+                },
+              }}
+              onClick={() => crumb.path && navigate(crumb.path)}
+            >
+              {crumb.label}
+            </Link>
+          ))}
         </Breadcrumbs>
       )}
 
-      {/* Header */}
       <Box
         sx={{
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 2,
         }}
       >
         <Box>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" component="h1" gutterBottom>
             {title}
           </Typography>
           {subtitle && (
-            <Typography variant="subtitle2" color="text.secondary">
+            <Typography variant="body1" color="text.secondary">
               {subtitle}
             </Typography>
           )}
         </Box>
 
-        {/* Action Button */}
-        {action && (
-          <Button
-            variant="contained"
-            startIcon={actionIcon}
-            onClick={onActionClick}
+        {actions && (
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              flexWrap: 'wrap',
+            }}
           >
-            {actionLabel}
-          </Button>
+            {actions}
+          </Box>
         )}
       </Box>
     </Box>

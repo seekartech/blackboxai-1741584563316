@@ -4,13 +4,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
   IconButton,
-  Typography,
   Box,
-  CircularProgress,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import Button from '../Button';
 
 function FormDialog({
   open,
@@ -18,50 +16,53 @@ function FormDialog({
   onSubmit,
   title,
   children,
-  submitText = 'Save',
+  submitText = 'Submit',
   cancelText = 'Cancel',
-  maxWidth = 'sm',
   loading = false,
-  disabled = false,
-  hideSubmit = false,
-  hideCancel = false,
+  maxWidth = 'sm',
   fullWidth = true,
+  showCloseButton = true,
   disableBackdropClick = false,
-  disableEscapeKeyDown = false,
+  ...props
 }) {
-  const handleClose = (event, reason) => {
-    if (loading) return;
-    if (disableBackdropClick && reason === 'backdropClick') return;
-    if (disableEscapeKeyDown && reason === 'escapeKeyDown') return;
-    onClose(event, reason);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(e);
   };
 
+  const handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget && !disableBackdropClick) {
+      onClose();
+    }
+  };
+
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       maxWidth={maxWidth}
       fullWidth={fullWidth}
-      disableEscapeKeyDown={disableEscapeKeyDown}
+      onClick={handleBackdropClick}
+      {...props}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="h6" component="span" sx={{ flex: 1 }}>
-              {title}
-            </Typography>
-            {!loading && (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            {title}
+            {showCloseButton && (
               <IconButton
-                aria-label="close"
+                edge="end"
+                color="inherit"
                 onClick={onClose}
-                sx={{
-                  color: (theme) => theme.palette.grey[500],
-                }}
+                aria-label="close"
+                size="small"
+                disabled={loading}
               >
                 <CloseIcon />
               </IconButton>
@@ -73,27 +74,24 @@ function FormDialog({
           {children}
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 2 }}>
-          {!hideCancel && (
-            <Button
-              onClick={onClose}
-              color="inherit"
-              disabled={loading}
-              sx={{ mr: 1 }}
-            >
-              {cancelText}
-            </Button>
-          )}
-          {!hideSubmit && (
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={disabled || loading}
-              startIcon={loading ? <CircularProgress size={20} /> : null}
-            >
-              {submitText}
-            </Button>
-          )}
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button
+            type="button"
+            variant="outlined"
+            color="inherit"
+            onClick={onClose}
+            disabled={loading}
+          >
+            {cancelText}
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            loading={loading}
+          >
+            {submitText}
+          </Button>
         </DialogActions>
       </form>
     </Dialog>

@@ -1,101 +1,46 @@
 import React from 'react';
-import { Button as MuiButton, CircularProgress, styled } from '@mui/material';
-import Tooltip from '../Tooltip';
+import { Button as MuiButton, CircularProgress } from '@mui/material';
 
-// Styled Button with enhanced styles and animations
-const StyledButton = styled(MuiButton)(({ theme, size = 'medium' }) => ({
-  borderRadius: 8,
-  textTransform: 'none',
-  transition: 'all 0.2s',
-  boxShadow: 'none',
-  '&:hover': {
-    boxShadow: theme.shadows[2],
-    transform: 'translateY(-1px)',
-  },
-  '&:active': {
-    transform: 'translateY(0)',
-  },
-  ...(size === 'small' && {
-    padding: '4px 12px',
-    fontSize: '0.8125rem',
-  }),
-  ...(size === 'medium' && {
-    padding: '6px 16px',
-    fontSize: '0.875rem',
-  }),
-  ...(size === 'large' && {
-    padding: '8px 22px',
-    fontSize: '0.9375rem',
-  }),
-}));
-
-function Button({
-  children,
-  loading = false,
-  disabled = false,
-  tooltip,
-  tooltipPlacement = 'top',
-  startIcon,
-  endIcon,
-  loadingPosition = 'center',
+function Button({ 
+  children, 
+  loading = false, 
+  startIcon, 
   variant = 'contained',
   color = 'primary',
   size = 'medium',
-  fullWidth = false,
-  onClick,
-  type = 'button',
-  ...props
+  sx = {},
+  ...props 
 }) {
-  const loadingSize = {
-    small: 20,
-    medium: 24,
-    large: 28,
-  }[size];
-
-  const button = (
-    <StyledButton
+  return (
+    <MuiButton
       variant={variant}
       color={color}
       size={size}
-      disabled={disabled || loading}
-      fullWidth={fullWidth}
-      onClick={onClick}
-      type={type}
-      startIcon={!loading && loadingPosition === 'start' ? startIcon : null}
-      endIcon={!loading && loadingPosition === 'end' ? endIcon : null}
+      startIcon={!loading && startIcon}
+      disabled={loading || props.disabled}
+      sx={{
+        position: 'relative',
+        textTransform: 'none',
+        minWidth: 100,
+        ...sx,
+      }}
       {...props}
     >
-      {loading && loadingPosition === 'start' && (
+      {loading && (
         <CircularProgress
-          size={loadingSize}
-          color="inherit"
-          sx={{ mr: 1, position: 'relative', top: 1 }}
+          size={24}
+          sx={{
+            position: 'absolute',
+            left: '50%',
+            marginLeft: '-12px',
+          }}
         />
       )}
-      {loading && loadingPosition === 'center' ? (
-        <CircularProgress size={loadingSize} color="inherit" />
-      ) : (
-        children
-      )}
-      {loading && loadingPosition === 'end' && (
-        <CircularProgress
-          size={loadingSize}
-          color="inherit"
-          sx={{ ml: 1, position: 'relative', top: 1 }}
-        />
-      )}
-    </StyledButton>
+      <span style={{ visibility: loading ? 'hidden' : 'visible' }}>
+        {children}
+      </span>
+    </MuiButton>
   );
-
-  if (tooltip && !disabled && !loading) {
-    return (
-      <Tooltip title={tooltip} placement={tooltipPlacement}>
-        {button}
-      </Tooltip>
-    );
-  }
-
-  return button;
 }
 
 export default Button;

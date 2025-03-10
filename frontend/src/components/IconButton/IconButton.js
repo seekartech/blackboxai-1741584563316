@@ -1,66 +1,49 @@
 import React from 'react';
-import { IconButton as MuiIconButton, styled } from '@mui/material';
+import { IconButton as MuiIconButton, CircularProgress } from '@mui/material';
 import Tooltip from '../Tooltip';
 
-// Styled IconButton with hover effects
-const StyledIconButton = styled(MuiIconButton)(({ theme, color = 'default' }) => ({
-  padding: 8,
-  transition: 'all 0.2s',
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-    transform: 'scale(1.1)',
-  },
-  ...(color === 'error' && {
-    color: theme.palette.error.main,
-    '&:hover': {
-      backgroundColor: theme.palette.error.light,
-    },
-  }),
-  ...(color === 'success' && {
-    color: theme.palette.success.main,
-    '&:hover': {
-      backgroundColor: theme.palette.success.light,
-    },
-  }),
-  ...(color === 'warning' && {
-    color: theme.palette.warning.main,
-    '&:hover': {
-      backgroundColor: theme.palette.warning.light,
-    },
-  }),
-  ...(color === 'info' && {
-    color: theme.palette.info.main,
-    '&:hover': {
-      backgroundColor: theme.palette.info.light,
-    },
-  }),
-}));
-
 function IconButton({
-  children,
+  icon: Icon,
+  loading = false,
   tooltip,
-  tooltipPlacement = 'top',
-  disabled = false,
-  size = 'medium',
   color = 'default',
-  onClick,
+  size = 'medium',
+  disabled = false,
+  sx = {},
   ...props
 }) {
   const button = (
-    <StyledIconButton
-      size={size}
+    <MuiIconButton
       color={color}
-      disabled={disabled}
-      onClick={onClick}
+      size={size}
+      disabled={disabled || loading}
+      sx={{
+        position: 'relative',
+        ...sx,
+      }}
       {...props}
     >
-      {children}
-    </StyledIconButton>
+      {loading ? (
+        <CircularProgress
+          size={24}
+          color="inherit"
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            marginTop: '-12px',
+            marginLeft: '-12px',
+          }}
+        />
+      ) : (
+        Icon && <Icon />
+      )}
+    </MuiIconButton>
   );
 
-  if (tooltip && !disabled) {
+  if (tooltip) {
     return (
-      <Tooltip title={tooltip} placement={tooltipPlacement}>
+      <Tooltip title={tooltip}>
         {button}
       </Tooltip>
     );

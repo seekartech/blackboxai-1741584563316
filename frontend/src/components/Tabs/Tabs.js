@@ -3,108 +3,71 @@ import {
   Tabs as MuiTabs,
   Tab as MuiTab,
   Box,
-  styled,
 } from '@mui/material';
-
-// Styled Tab component
-const StyledTab = styled(MuiTab)(({ theme }) => ({
-  textTransform: 'none',
-  minWidth: 0,
-  padding: '12px 16px',
-  marginRight: theme.spacing(4),
-  fontWeight: theme.typography.fontWeightRegular,
-  color: theme.palette.text.secondary,
-  '&:hover': {
-    color: theme.palette.text.primary,
-    opacity: 1,
-  },
-  '&.Mui-selected': {
-    color: theme.palette.primary.main,
-    fontWeight: theme.typography.fontWeightMedium,
-  },
-  '&.Mui-focusVisible': {
-    backgroundColor: theme.palette.action.selected,
-  },
-}));
-
-// Styled Tabs component
-const StyledTabs = styled(MuiTabs)(({ theme }) => ({
-  '& .MuiTabs-indicator': {
-    height: 3,
-    borderTopLeftRadius: 3,
-    borderTopRightRadius: 3,
-    backgroundColor: theme.palette.primary.main,
-  },
-}));
 
 function TabPanel({ children, value, index, ...props }) {
   return (
-    <Box
+    <div
       role="tabpanel"
       hidden={value !== index}
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
       {...props}
     >
-      {value === index && <Box>{children}</Box>}
-    </Box>
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
   );
-}
-
-function a11yProps(index) {
-  return {
-    id: `tab-${index}`,
-    'aria-controls': `tabpanel-${index}`,
-  };
 }
 
 function Tabs({
   value,
   onChange,
   tabs = [],
-  orientation = 'horizontal',
   variant = 'standard',
+  orientation = 'horizontal',
   centered = false,
   scrollButtons = 'auto',
   indicatorColor = 'primary',
   textColor = 'primary',
-  children,
   sx = {},
+  ...props
 }) {
   return (
     <Box sx={{ width: '100%', ...sx }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <StyledTabs
+        <MuiTabs
           value={value}
           onChange={onChange}
-          orientation={orientation}
           variant={variant}
+          orientation={orientation}
           centered={centered}
           scrollButtons={scrollButtons}
           indicatorColor={indicatorColor}
           textColor={textColor}
-          aria-label="tabs"
+          {...props}
         >
           {tabs.map((tab, index) => (
-            <StyledTab
+            <MuiTab
               key={index}
               label={tab.label}
               icon={tab.icon}
-              iconPosition={tab.iconPosition}
               disabled={tab.disabled}
-              {...a11yProps(index)}
+              sx={{
+                minHeight: 48,
+                textTransform: 'none',
+                fontWeight: 500,
+              }}
             />
           ))}
-        </StyledTabs>
+        </MuiTabs>
       </Box>
-      {React.Children.map(children, (child, index) => (
-        <TabPanel value={value} index={index}>
-          {child}
+      {tabs.map((tab, index) => (
+        <TabPanel key={index} value={value} index={index}>
+          {tab.content}
         </TabPanel>
       ))}
     </Box>
   );
 }
 
-export { TabPanel };
 export default Tabs;

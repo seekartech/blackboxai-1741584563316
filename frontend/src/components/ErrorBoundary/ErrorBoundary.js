@@ -1,15 +1,11 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
-import { ErrorOutline as ErrorIcon, Refresh as RefreshIcon } from '@mui/icons-material';
+import { Error as ErrorIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      hasError: false,
-      error: null,
-      errorInfo: null
-    };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -19,19 +15,16 @@ class ErrorBoundary extends React.Component {
   componentDidCatch(error, errorInfo) {
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     });
 
-    // You can log the error to an error reporting service here
-    console.error('Error caught by ErrorBoundary:', error, errorInfo);
+    // Log the error to an error reporting service
+    console.error('Error:', error);
+    console.error('Error Info:', errorInfo);
   }
 
-  handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null
-    });
+  handleRefresh = () => {
+    window.location.reload();
   };
 
   render() {
@@ -49,31 +42,31 @@ class ErrorBoundary extends React.Component {
           }}
         >
           <ErrorIcon
-            sx={{
-              fontSize: 64,
-              color: 'error.main',
-              mb: 2,
-            }}
+            color="error"
+            sx={{ fontSize: 64, mb: 2 }}
           />
-          
-          <Typography variant="h5" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             Oops! Something went wrong
           </Typography>
-          
           <Typography
             variant="body1"
             color="text.secondary"
-            sx={{ maxWidth: 500, mb: 4 }}
+            sx={{ mb: 3, maxWidth: 500 }}
           >
-            {this.props.fallbackMessage || 
-              "We're sorry, but something went wrong. Please try refreshing the page or contact support if the problem persists."}
+            We apologize for the inconvenience. Please try refreshing the page or contact support if the problem persists.
           </Typography>
-
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={this.handleRefresh}
+            startIcon={<RefreshIcon />}
+          >
+            Refresh Page
+          </Button>
           {process.env.NODE_ENV === 'development' && this.state.error && (
             <Box
               sx={{
-                mt: 2,
-                mb: 4,
+                mt: 4,
                 p: 2,
                 bgcolor: 'grey.100',
                 borderRadius: 1,
@@ -83,45 +76,19 @@ class ErrorBoundary extends React.Component {
                 textAlign: 'left',
               }}
             >
-              <Typography variant="subtitle2" color="error" gutterBottom>
+              <Typography variant="h6" gutterBottom>
                 Error Details:
               </Typography>
               <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
                 {this.state.error.toString()}
               </pre>
               {this.state.errorInfo && (
-                <>
-                  <Typography variant="subtitle2" color="error" sx={{ mt: 2 }} gutterBottom>
-                    Component Stack:
-                  </Typography>
-                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
-                    {this.state.errorInfo.componentStack}
-                  </pre>
-                </>
+                <pre style={{ marginTop: 16, whiteSpace: 'pre-wrap' }}>
+                  {this.state.errorInfo.componentStack}
+                </pre>
               )}
             </Box>
           )}
-
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<RefreshIcon />}
-              onClick={() => window.location.reload()}
-            >
-              Refresh Page
-            </Button>
-            {this.props.onReset && (
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  this.handleReset();
-                  this.props.onReset();
-                }}
-              >
-                Try Again
-              </Button>
-            )}
-          </Box>
         </Box>
       );
     }

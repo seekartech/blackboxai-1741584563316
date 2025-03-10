@@ -1,44 +1,29 @@
 import React from 'react';
 import { TextField as MuiTextField } from '@mui/material';
 
-function TextField({
-  error,
-  helperText,
-  required,
-  fullWidth = true,
-  size = 'medium',
-  variant = 'outlined',
-  margin = 'normal',
-  ...props
-}) {
-  // Add custom styling and behavior
-  const customProps = {
-    error: !!error,
-    helperText: error || helperText,
-    required,
-    fullWidth,
-    size,
-    variant,
-    margin,
-    sx: {
-      '& .MuiOutlinedInput-root': {
-        '&.Mui-focused fieldset': {
-          borderColor: error ? 'error.main' : 'primary.main',
+function TextField({ error, helperText, sx = {}, ...props }) {
+  return (
+    <MuiTextField
+      variant="outlined"
+      fullWidth
+      error={!!error}
+      helperText={error || helperText}
+      sx={{
+        '& .MuiOutlinedInput-root': {
+          borderRadius: 1,
+          backgroundColor: 'background.paper',
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'primary.main',
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderWidth: 2,
+          },
         },
-      },
-      '& .MuiFormHelperText-root': {
-        marginLeft: 0,
-        marginRight: 0,
-      },
-      ...props.sx,
-    },
-    InputLabelProps: {
-      shrink: true,
-      ...props.InputLabelProps,
-    },
-  };
-
-  return <MuiTextField {...customProps} {...props} />;
+        ...sx,
+      }}
+      {...props}
+    />
+  );
 }
 
 export default TextField;

@@ -14,46 +14,40 @@ function Select({
   options = [],
   error,
   helperText,
-  required,
   fullWidth = true,
-  size = 'medium',
-  margin = 'normal',
+  required = false,
   disabled = false,
-  multiple = false,
-  placeholder = 'Select an option',
-  valueKey = 'value',
-  labelKey = 'label',
+  size = 'medium',
+  sx = {},
   ...props
 }) {
+  const id = React.useId();
+  const labelId = `${id}-label`;
+
   return (
     <FormControl
+      fullWidth={fullWidth}
       error={!!error}
       required={required}
-      fullWidth={fullWidth}
-      size={size}
-      margin={margin}
       disabled={disabled}
+      size={size}
+      sx={sx}
     >
-      {label && <InputLabel>{label}</InputLabel>}
+      {label && <InputLabel id={labelId}>{label}</InputLabel>}
       <MuiSelect
+        labelId={labelId}
         value={value}
         onChange={onChange}
         label={label}
-        multiple={multiple}
-        displayEmpty
         {...props}
       >
-        {!multiple && (
-          <MenuItem value="" disabled>
-            {placeholder}
-          </MenuItem>
-        )}
         {options.map((option) => (
           <MenuItem
-            key={option[valueKey] || option}
-            value={option[valueKey] || option}
+            key={option.value}
+            value={option.value}
+            disabled={option.disabled}
           >
-            {option[labelKey] || option}
+            {option.label}
           </MenuItem>
         ))}
       </MuiSelect>

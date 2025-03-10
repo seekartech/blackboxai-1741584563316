@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  TextField,
-  InputAdornment,
+  InputBase,
   IconButton,
-  Box,
+  Paper,
+  InputAdornment,
   CircularProgress,
 } from '@mui/material';
 import {
@@ -16,79 +16,83 @@ function SearchInput({
   onChange,
   onClear,
   placeholder = 'Search...',
-  size = 'small',
-  fullWidth = true,
   loading = false,
   debounceMs = 300,
-  disabled = false,
+  fullWidth = true,
+  size = 'medium',
   sx = {},
   ...props
 }) {
-  const [debouncedValue, setDebouncedValue] = React.useState(value);
-  const timeoutRef = React.useRef(null);
+  const [inputValue, setInputValue] = React.useState(value);
+  const debounceTimer = React.useRef(null);
 
   React.useEffect(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    setInputValue(value);
+  }, [value]);
+
+  const handleChange = (event) => {
+    const newValue = event.target.value;
+    setInputValue(newValue);
+
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
     }
 
-    timeoutRef.current = setTimeout(() => {
-      setDebouncedValue(value);
+    debounceTimer.current = setTimeout(() => {
+      onChange(newValue);
     }, debounceMs);
+  };
 
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [value, debounceMs]);
-
-  React.useEffect(() => {
-    if (debouncedValue !== value) {
-      onChange?.(debouncedValue);
+  const handleClear = () => {
+    setInputValue('');
+    if (onClear) {
+      onClear();
+    } else {
+      onChange('');
     }
-  }, [debouncedValue]);
-
-  const handleClear = (event) => {
-    event.stopPropagation();
-    onClear?.();
   };
 
   return (
-    <Box sx={{ position: 'relative', ...sx }}>
-      <TextField
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
+    <Paper
+      sx={{
+        p: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+        width: fullWidth ? '100%' : 'auto',
+        ...sx,
+      }}
+    >
+      <InputBase
+        value={inputValue}
+        onChange={handleChange}
         placeholder={placeholder}
+        fullWidth
         size={size}
-        fullWidth={fullWidth}
-        disabled={disabled || loading}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon color="action" />
-            </InputAdornment>
-          ),
-          endAdornment: (
-            <InputAdornment position="end">
-              {loading ? (
-                <CircularProgress size={20} />
-              ) : value ? (
+        startAdornment={
+          <InputAdornment position="start">
+            <SearchIcon color="action" />
+          </InputAdornment>
+        }
+        endAdornment={
+          <InputAdornment position="end">
+            {loading ? (
+              <CircularProgress size={20} />
+            ) : (
+              inputValue && (
                 <IconButton
                   size="small"
                   onClick={handleClear}
-                  disabled={disabled}
-                  sx={{ mr: -1 }}
+                  aria-label="clear search"
                 >
                   <ClearIcon fontSize="small" />
                 </IconButton>
-              ) : null}
-            </InputAdornment>
-          ),
-        }}
+              )
+            )}
+          </InputAdornment>
+        }
         {...props}
       />
-    </Box>
+    </Paper>
   );
 }
 

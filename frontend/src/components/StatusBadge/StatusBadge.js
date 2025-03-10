@@ -1,152 +1,76 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Chip } from '@mui/material';
 
-const statusConfigs = {
-  // Transaction statuses
+const statusColors = {
+  success: {
+    color: 'success',
+    label: 'Success',
+  },
+  error: {
+    color: 'error',
+    label: 'Error',
+  },
+  warning: {
+    color: 'warning',
+    label: 'Warning',
+  },
+  info: {
+    color: 'info',
+    label: 'Info',
+  },
   pending: {
-    color: '#ff9800',
-    backgroundColor: '#fff3e0',
+    color: 'warning',
     label: 'Pending',
   },
   completed: {
-    color: '#4caf50',
-    backgroundColor: '#e8f5e9',
+    color: 'success',
     label: 'Completed',
   },
   cancelled: {
-    color: '#f44336',
-    backgroundColor: '#ffebee',
+    color: 'error',
     label: 'Cancelled',
   },
-  // Purchase statuses
-  draft: {
-    color: '#607d8b',
-    backgroundColor: '#eceff1',
-    label: 'Draft',
-  },
-  ordered: {
-    color: '#2196f3',
-    backgroundColor: '#e3f2fd',
-    label: 'Ordered',
-  },
-  received: {
-    color: '#4caf50',
-    backgroundColor: '#e8f5e9',
-    label: 'Received',
-  },
-  partial: {
-    color: '#ff9800',
-    backgroundColor: '#fff3e0',
-    label: 'Partially Received',
-  },
-  // Payment statuses
-  paid: {
-    color: '#4caf50',
-    backgroundColor: '#e8f5e9',
-    label: 'Paid',
-  },
-  unpaid: {
-    color: '#f44336',
-    backgroundColor: '#ffebee',
-    label: 'Unpaid',
-  },
-  partial_payment: {
-    color: '#ff9800',
-    backgroundColor: '#fff3e0',
-    label: 'Partial Payment',
-  },
-  // Stock statuses
-  in_stock: {
-    color: '#4caf50',
-    backgroundColor: '#e8f5e9',
-    label: 'In Stock',
-  },
-  low_stock: {
-    color: '#ff9800',
-    backgroundColor: '#fff3e0',
-    label: 'Low Stock',
-  },
-  out_of_stock: {
-    color: '#f44336',
-    backgroundColor: '#ffebee',
-    label: 'Out of Stock',
-  },
-  // User statuses
   active: {
-    color: '#4caf50',
-    backgroundColor: '#e8f5e9',
+    color: 'success',
     label: 'Active',
   },
   inactive: {
-    color: '#f44336',
-    backgroundColor: '#ffebee',
+    color: 'error',
     label: 'Inactive',
+  },
+  draft: {
+    color: 'default',
+    label: 'Draft',
   },
 };
 
-function StatusBadge({ 
-  status, 
+function StatusBadge({
+  status,
   customLabel,
-  size = 'medium',
-  variant = 'contained',
+  customColor,
+  variant = 'filled',
+  size = 'small',
+  sx = {},
+  ...props
 }) {
-  const config = statusConfigs[status] || {
-    color: '#9e9e9e',
-    backgroundColor: '#f5f5f5',
-    label: status,
-  };
-
-  const sizeStyles = {
-    small: {
-      px: 1,
-      py: 0.25,
-      fontSize: '0.75rem',
-    },
-    medium: {
-      px: 1.5,
-      py: 0.5,
-      fontSize: '0.875rem',
-    },
-    large: {
-      px: 2,
-      py: 0.75,
-      fontSize: '1rem',
-    },
-  };
-
-  const variantStyles = {
-    contained: {
-      backgroundColor: config.backgroundColor,
-      color: config.color,
-    },
-    outlined: {
-      backgroundColor: 'transparent',
-      color: config.color,
-      border: `1px solid ${config.color}`,
-    },
+  const statusConfig = statusColors[status?.toLowerCase()] || {
+    color: customColor || 'default',
+    label: customLabel || status,
   };
 
   return (
-    <Box
+    <Chip
+      label={statusConfig.label}
+      color={statusConfig.color}
+      variant={variant}
+      size={size}
       sx={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        borderRadius: '16px',
-        ...sizeStyles[size],
-        ...variantStyles[variant],
+        fontWeight: 500,
+        textTransform: 'capitalize',
+        ...sx,
       }}
-    >
-      <Typography
-        variant="caption"
-        sx={{
-          fontWeight: 600,
-          textTransform: 'capitalize',
-          lineHeight: 1,
-        }}
-      >
-        {customLabel || config.label}
-      </Typography>
-    </Box>
+      {...props}
+    />
   );
 }
 

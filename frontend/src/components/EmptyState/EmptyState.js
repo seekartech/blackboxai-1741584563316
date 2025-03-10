@@ -1,25 +1,14 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
-import {
-  InboxOutlined as InboxIcon,
-  SearchOff as SearchOffIcon,
-  ErrorOutline as ErrorIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
-
-const illustrations = {
-  inbox: <InboxIcon sx={{ fontSize: 64, color: 'action.active', mb: 2 }} />,
-  search: <SearchOffIcon sx={{ fontSize: 64, color: 'action.active', mb: 2 }} />,
-  error: <ErrorIcon sx={{ fontSize: 64, color: 'action.active', mb: 2 }} />,
-};
+import { Box, Typography } from '@mui/material';
+import { SentimentDissatisfied as EmptyIcon } from '@mui/icons-material';
+import Button from '../Button';
 
 function EmptyState({
-  type = 'inbox',
-  title = 'No Data',
-  description = 'No data available at the moment.',
+  title = 'No Data Found',
+  description = 'There are no items to display.',
+  icon: Icon = EmptyIcon,
   action,
-  actionLabel = 'Add New',
-  actionIcon = <AddIcon />,
+  actionText = 'Add New',
   sx = {},
 }) {
   return (
@@ -29,38 +18,37 @@ function EmptyState({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        p: 4,
+        minHeight: 300,
         textAlign: 'center',
-        py: 8,
-        px: 2,
         ...sx,
       }}
     >
-      {illustrations[type]}
-      
-      <Typography
-        variant="h6"
-        gutterBottom
-        sx={{ color: 'text.primary', fontWeight: 500 }}
-      >
+      <Icon
+        sx={{
+          fontSize: 64,
+          color: 'text.secondary',
+          mb: 2,
+        }}
+      />
+      <Typography variant="h6" gutterBottom>
         {title}
       </Typography>
-      
       <Typography
         variant="body2"
         color="text.secondary"
-        sx={{ maxWidth: 400, mb: action ? 3 : 0 }}
+        sx={{ mb: action ? 3 : 0 }}
       >
         {description}
       </Typography>
-
       {action && (
         <Button
           variant="contained"
-          startIcon={actionIcon}
+          color="primary"
           onClick={action}
-          sx={{ mt: 2 }}
+          startIcon={<Icon />}
         >
-          {actionLabel}
+          {actionText}
         </Button>
       )}
     </Box>

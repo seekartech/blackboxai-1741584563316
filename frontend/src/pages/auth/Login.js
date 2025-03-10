@@ -1,194 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
-  Box,
   Container,
   Paper,
-  TextField,
-  Button,
   Typography,
-  InputAdornment,
-  IconButton,
-  CircularProgress,
+  Box,
+  Alert,
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import TextField from '../../components/TextField';
+import Button from '../../components/Button';
 import { login, selectAuth } from '../../store/slices/authSlice';
 
 function Login() {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { isAuthenticated, loading, error } = useSelector(selectAuth);
-
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector(selectAuth);
 
-  const validateForm = () => {
-    const errors = {};
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Email is invalid';
-    }
-    if (!formData.password) {
-      errors.password = 'Password is required';
-    }
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      dispatch(login(formData));
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
+    
+    // For demo purposes, we'll just simulate a successful login
+    dispatch(login({
+      user: {
+        id: 1,
+        name: 'Admin User',
+        email: formData.email,
+        role: 'admin',
+      },
+      token: 'demo-token',
     }));
-    // Clear error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    
+    navigate('/dashboard');
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'background.default',
-      }}
-    >
-      <Container maxWidth="sm">
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{
-              mb: 4,
-              fontWeight: 600,
-              color: 'primary.main',
-            }}
-          >
-            Masda Teknik
-          </Typography>
+    <Container maxWidth="sm" sx={{ mt: 8 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h4" component="h1" align="center" gutterBottom>
+          Login
+        </Typography>
 
-          <Typography
-            component="h2"
-            variant="h5"
-            sx={{
-              mb: 3,
-              fontWeight: 500,
-            }}
-          >
-            Sign In
-          </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
-          {error && (
-            <Typography
-              color="error"
-              variant="body2"
-              sx={{ mb: 2, textAlign: 'center' }}
-            >
-              {error}
-            </Typography>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
+        <form onSubmit={handleSubmit}>
+          <Box sx={{ mb: 2 }}>
             <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
+              label="Email"
+              type="email"
               name="email"
-              autoComplete="email"
-              autoFocus
               value={formData.email}
               onChange={handleChange}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-              disabled={loading}
-            />
-
-            <TextField
-              margin="normal"
-              required
               fullWidth
-              name="password"
+              required
+            />
+          </Box>
+
+          <Box sx={{ mb: 3 }}>
+            <TextField
               label="Password"
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              autoComplete="current-password"
+              type="password"
+              name="password"
               value={formData.password}
               onChange={handleChange}
-              error={!!formErrors.password}
-              helperText={formErrors.password}
-              disabled={loading}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={togglePasswordVisibility}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-
-            <Button
-              type="submit"
               fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2, py: 1.2 }}
-              disabled={loading}
-            >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'Sign In'
-              )}
-            </Button>
+              required
+            />
           </Box>
-        </Paper>
-      </Container>
-    </Box>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            loading={loading}
+          >
+            Login
+          </Button>
+        </form>
+      </Paper>
+    </Container>
   );
 }
 

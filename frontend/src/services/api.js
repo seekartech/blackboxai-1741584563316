@@ -1,115 +1,86 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000/api',
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-    },
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Add a request interceptor
+// Request interceptor
 api.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Add a response interceptor
+// Response interceptor
 api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-        if (error.response?.status === 401) {
-            // Handle unauthorized access
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
+    return Promise.reject(error);
+  }
 );
 
-export const authAPI = {
-    login: (credentials) => api.post('/login', credentials),
-    logout: () => api.post('/logout'),
-    getUser: () => api.get('/user'),
+// Auth endpoints
+export const auth = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  logout: () => api.post('/auth/logout'),
+  register: (data) => api.post('/auth/register', data),
+  me: () => api.get('/auth/me'),
 };
 
-export const productsAPI = {
-    getAll: (params) => api.get('/products', { params }),
-    getOne: (id) => api.get(`/products/${id}`),
-    create: (data) => api.post('/products', data),
-    update: (id, data) => api.put(`/products/${id}`, data),
-    delete: (id) => api.delete(`/products/${id}`),
-    search: (query) => api.get('/products/search', { params: { query } }),
+// Products endpoints
+export const products = {
+  getAll: (params) => api.get('/products', { params }),
+  getById: (id) => api.get(`/products/${id}`),
+  create: (data) => api.post('/products', data),
+  update: (id, data) => api.put(`/products/${id}`, data),
+  delete: (id) => api.delete(`/products/${id}`),
 };
 
-export const categoriesAPI = {
-    getAll: () => api.get('/categories'),
-    getOne: (id) => api.get(`/categories/${id}`),
-    create: (data) => api.post('/categories', data),
-    update: (id, data) => api.put(`/categories/${id}`, data),
-    delete: (id) => api.delete(`/categories/${id}`),
+// Categories endpoints
+export const categories = {
+  getAll: (params) => api.get('/categories', { params }),
+  getById: (id) => api.get(`/categories/${id}`),
+  create: (data) => api.post('/categories', data),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`),
 };
 
-export const customersAPI = {
-    getAll: (params) => api.get('/customers', { params }),
-    getOne: (id) => api.get(`/customers/${id}`),
-    create: (data) => api.post('/customers', data),
-    update: (id, data) => api.put(`/customers/${id}`, data),
-    delete: (id) => api.delete(`/customers/${id}`),
-    search: (query) => api.get('/customers/search', { params: { query } }),
+// Transactions endpoints
+export const transactions = {
+  getAll: (params) => api.get('/transactions', { params }),
+  getById: (id) => api.get(`/transactions/${id}`),
+  create: (data) => api.post('/transactions', data),
+  update: (id, data) => api.put(`/transactions/${id}`, data),
+  delete: (id) => api.delete(`/transactions/${id}`),
 };
 
-export const suppliersAPI = {
-    getAll: (params) => api.get('/suppliers', { params }),
-    getOne: (id) => api.get(`/suppliers/${id}`),
-    create: (data) => api.post('/suppliers', data),
-    update: (id, data) => api.put(`/suppliers/${id}`, data),
-    delete: (id) => api.delete(`/suppliers/${id}`),
+// Purchases endpoints
+export const purchases = {
+  getAll: (params) => api.get('/purchases', { params }),
+  getById: (id) => api.get(`/purchases/${id}`),
+  create: (data) => api.post('/purchases', data),
+  update: (id, data) => api.put(`/purchases/${id}`, data),
+  delete: (id) => api.delete(`/purchases/${id}`),
 };
 
-export const transactionsAPI = {
-    getAll: (params) => api.get('/transactions', { params }),
-    getOne: (id) => api.get(`/transactions/${id}`),
-    create: (data) => api.post('/transactions', data),
-    update: (id, data) => api.put(`/transactions/${id}`, data),
-};
-
-export const purchasesAPI = {
-    getAll: (params) => api.get('/purchases', { params }),
-    getOne: (id) => api.get(`/purchases/${id}`),
-    create: (data) => api.post('/purchases', data),
-    update: (id, data) => api.put(`/purchases/${id}`, data),
-    receive: (id) => api.patch(`/purchases/${id}/receive`),
-};
-
-export const usersAPI = {
-    getAll: (params) => api.get('/users', { params }),
-    getOne: (id) => api.get(`/users/${id}`),
-    create: (data) => api.post('/users', data),
-    update: (id, data) => api.put(`/users/${id}`, data),
-    delete: (id) => api.delete(`/users/${id}`),
-    toggleActive: (id) => api.patch(`/users/${id}/toggle-active`),
-};
-
-export const dashboardAPI = {
-    getStats: () => api.get('/dashboard/stats'),
-    getCashierStats: () => api.get('/dashboard/cashier-stats'),
-    getPurchasingStats: () => api.get('/dashboard/purchasing-stats'),
-};
-
-export const reportsAPI = {
-    getSales: (params) => api.get('/reports/sales', { params }),
-    getPurchases: (params) => api.get('/reports/purchases', { params }),
-    getInventory: () => api.get('/reports/inventory'),
-    getProfit: (params) => api.get('/reports/profit', { params }),
+// Dashboard endpoints
+export const dashboard = {
+  getStats: () => api.get('/dashboard/stats'),
+  getChartData: (params) => api.get('/dashboard/chart', { params }),
 };
 
 export default api;

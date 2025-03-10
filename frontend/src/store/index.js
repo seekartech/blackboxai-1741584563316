@@ -1,36 +1,27 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './slices/authSlice';
-import productsReducer from './slices/productsSlice';
-import categoriesReducer from './slices/categoriesSlice';
-import transactionsReducer from './slices/transactionsSlice';
-import purchasesReducer from './slices/purchasesSlice';
+import { combineReducers } from 'redux';
+
+// Import slices
+import authSlice from './slices/authSlice';
+import productsSlice from './slices/productsSlice';
+import categoriesSlice from './slices/categoriesSlice';
+import transactionsSlice from './slices/transactionsSlice';
+import purchasesSlice from './slices/purchasesSlice';
+
+const rootReducer = combineReducers({
+  auth: authSlice,
+  products: productsSlice,
+  categories: categoriesSlice,
+  transactions: transactionsSlice,
+  purchases: purchasesSlice,
+});
 
 const store = configureStore({
-    reducer: {
-        auth: authReducer,
-        products: productsReducer,
-        categories: categoriesReducer,
-        transactions: transactionsReducer,
-        purchases: purchasesReducer,
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware({
-            serializableCheck: {
-                // Ignore these action types
-                ignoredActions: ['persist/PERSIST'],
-                // Ignore these field paths in all actions
-                ignoredActionPaths: ['payload.timestamp', 'meta.arg'],
-                // Ignore these paths in the state
-                ignoredPaths: [
-                    'transactions.cart.items.product',
-                    'purchases.draft.items.product',
-                ],
-            },
-        }),
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export default store;
-
-// Hooks for TypeScript support (even though we're not using TypeScript)
-export const useAppDispatch = () => useDispatch();
-export const useAppSelector = useSelector;
